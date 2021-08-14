@@ -1,6 +1,6 @@
 {
   "name": "flarouter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Router middleware for cloudflare-workers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,7 @@
   "scripts": {
     "format": "prettier --write src",
     "clean": "rimraf dist",
+    "build-full": "rimraf dist && tsc",
     "build": "rimraf dist && ncc build src/index.ts -o dist -m"
   },
   "dependencies": {},

@@ -88,14 +88,14 @@ export function findRoute(method: string, pathname: string, route: TObject) {
   return { params, fns };
 }
 export function createRegex(str: string) {
-  let wild = "";
-  if (str[str.length - 1] === "*") wild = "(.*)";
+  let noop = "",
+    ptt = "/([^/]+?)",
+    last = str[str.length - 1];
+  if (last === "*") noop = "(.*)";
+  else if (last === "?") ptt = "(?:/([^/]+?))?";
   const m = str.match(/\:([a-z_-]+)/g);
   let arr = m ? m.map((e) => e.substring(1)) : [];
-  if (wild) arr.push("wild");
-  const rgx = new RegExp(
-    `^${str.replace(/\/:[a-z_-]+/g, "/([^/]+?)")}/${wild}?$`,
-    "i"
-  );
+  if (noop) arr.push("wild");
+  const rgx = new RegExp(`^${str.replace(/\/:[a-z_-]+/g, ptt)}/${noop}?$`, "i");
   return { arr, rgx };
 }

@@ -14,6 +14,7 @@ export type FetchEvent = {
   query: TObject;
   body: TObject;
   response: HttpResponse;
+  parsedUrl: URL;
   [k: string]: any;
 };
 export type RetHandler =

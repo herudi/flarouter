@@ -1,5 +1,5 @@
 # Flarouter
-[![npm version](https://img.shields.io/badge/npm-1.0.0-blue.svg)](https://npmjs.org/package/flarouter) 
+[![npm version](https://img.shields.io/badge/npm-1.0.1-blue.svg)](https://npmjs.org/package/flarouter) 
 [![License](https://img.shields.io/:license-mit-blue.svg)](http://badges.mit-license.org)
 [![download-url](https://img.shields.io/npm/dm/flarouter.svg)](https://npmjs.org/package/flarouter)
 
@@ -24,19 +24,20 @@ npm i flarouter
 import { createRouter } from "flarouter";
 
 const handleEvent = createRouter({
-    "GET/foo": (evt, next) => {
-        return "bar";
-    },
-    "GET/json": (evt, next) => {
-        return { name: "jason" };
-    },
-    "GET/res": (evt, next) => {
-        return new Response("res");
-    }
+  "GET/foo": (evt, next) => {
+    return "bar";
+  },
+  "GET/foo/:name": (evt, next) => {
+    const { name } = evt.params;
+    return { my_name: name };
+  },
+  "GET/res": (evt, next) => {
+    return new Response("res");
+  }
 });
 
 addEventListener("fetch", (evt) => {
-    evt.respondWith(handleEvent(evt));
+  evt.respondWith(handleEvent(evt));
 });
 ```
 
@@ -57,25 +58,25 @@ Go to http://127.0.0.1:8787/foo
 
 // cors example
 const cors = (evt, next) => {
-    const { response } = evt;
-    response.headers.set("Access-Control-Allow-Origin", "*");
-    response.headers.set("Access-Control-Allow-Headers", "*");
-    response.headers.set("Access-Control-Allow-Methods", "*");
-    return next();
+  const { response } = evt;
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Headers", "*");
+  response.headers.set("Access-Control-Allow-Methods", "*");
+  return next();
 }
 const foobar = (evt, next) => {
-    // evt.locals help for declare middleware variable.
-    evt.locals.foo = "bar";
-    return next();
+  // evt.locals help for declare middleware variable.
+  evt.locals.foo = "bar";
+  return next();
 }
 const options = {
-    wares: [cors, foobar]
+  wares: [cors, foobar]
 }
 const handleEvent = createRouter(options, {
-    "GET/hello": (evt) => {
-        return evt.locals;
-        // => { foo: "bar" }
-    }
+  "GET/hello": (evt) => {
+    return evt.locals;
+    // => { foo: "bar" }
+  }
 });
 ...
 ```
@@ -83,17 +84,17 @@ const handleEvent = createRouter(options, {
 ```js
 ...
 const handleEvent = createRouter({
-    "GET/foo": [
-        // example auth
-        (evt, next) => {
-            const token = evt.request.headers.get("x-api-key") || "";
-            if (token === "123") return next();
-            throw new Error("Token not provided");
-        },
-        (evt, next) => {
-            return "Success";
-        },
-    ]
+  "GET/foo": [
+    // example auth
+    (evt, next) => {
+      const token = evt.request.headers.get("x-api-key") || "";
+      if (token === "123") return next();
+      throw new Error("Token not provided");
+    },
+    (evt, next) => {
+      return "Success";
+    },
+  ]
 });
 ...
 ```
@@ -101,15 +102,15 @@ const handleEvent = createRouter({
 ```js
 ...
 const handleEvent = createRouter({
-    "GET/hello/:name": (evt, next) => {
-        const { name } = evt.params;
-        return "hello " + name;
-    },
-    // exact all
-    "GET/*": (evt, next) => {
-        const { wild } = evt.params;
-        return wild;
-    }
+  "GET/hello/:name": (evt, next) => {
+    const { name } = evt.params;
+    return "hello " + name;
+  },
+  // exact all
+  "GET/*": (evt, next) => {
+    const { wild } = evt.params;
+    return wild;
+  }
 });
 ...
 ```
@@ -118,11 +119,11 @@ Example: http://127.0.0.1:8787/hello?name=john
 ```js
 ...
 const handleEvent = createRouter({
-    "GET/hello": (evt, next) => {
-        const { name } = evt.query;
-        if (!name) throw new Error("query name is required !");
-        return "hello " + name;
-    }
+  "GET/hello": (evt, next) => {
+    const { name } = evt.query;
+    if (!name) throw new Error("query name is required !");
+    return "hello " + name;
+  }
 });
 ...
 ```
@@ -131,12 +132,12 @@ support (json, urlencoded, multipart, text);
 ```js
 ...
 const handleEvent = createRouter({
-    "POST/hello": (evt, next) => {
-        const { name } = evt.body;
-        if (!name) throw new Error("field name is required !");
-        evt.response.status = 201;
-        return "Created " + name;
-    }
+  "POST/hello": (evt, next) => {
+    const { name } = evt.body;
+    if (!name) throw new Error("field name is required !");
+    evt.response.status = 201;
+    return "Created " + name;
+  }
 });
 ...
 ```
@@ -145,13 +146,13 @@ const handleEvent = createRouter({
 ...
 // item router
 const itemRouter = {
-    "GET/item": _ => "item",
-    "GET/item/:id": ({ params }) => "item " + params.id,
+  "GET/item": _ => "item",
+  "GET/item/:id": ({ params }) => "item " + params.id,
 }
 // brand router
 const brandRouter = {
-    "GET/brand": _ => "brand",
-    "GET/brand/:id": ({ params }) => "brand " + params.id,
+  "GET/brand": _ => "brand",
+  "GET/brand/:id": ({ params }) => "brand " + params.id,
 }
 const handleEvent = createRouter(itemRouter, brandRouter);
 ...
@@ -164,18 +165,18 @@ import { createRouter, area } from "flarouter";
 const itemRouter = { "GET/item": _ => "item" };
 const brandRouter = { "GET/brand": _ => "brand" };
 const apiArea = area({
-    prefix: "/api/v1",
-    router: [itemRouter, brandRouter],
-    // wares: [foo, bar]
+  prefix: "/api/v1",
+  router: [itemRouter, brandRouter],
+  // wares: [foo, bar]
 });
 
 // Frontend Area
 const homeRouter = { "GET/home": _ => "home" };
 const aboutRouter = { "GET/about": _ => "about" };
 const frontendArea = area({
-    prefix: "/",
-    router: [homeRouter, aboutRouter],
-    // wares: [foo, bar]
+  prefix: "/",
+  router: [homeRouter, aboutRouter],
+  // wares: [foo, bar]
 });
 
 // handle event
@@ -196,17 +197,12 @@ evt.response.headers;
 ```js
 ...
 const options = {
-    // handle error
-    onError: (err) => {
-        return { status: err.status, message: err.message }
-    },
-    // handle 404
-    on404: (evt) => {
-        return { status: 404, message: "not found" }
-    }
+  // handle error
+  onError: (err) => ({ status: err.status, message: err.message }),
+  // handle 404
+  on404: (evt) => ({ status: 404, message: "not found" })
 }
 
-// handle event
 const handleEvent = createRouter(options, ...moreRouter);
 ...
 ```
