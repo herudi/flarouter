@@ -106,7 +106,7 @@ function router(
     evt.locals = {};
     evt.params = params;
     evt.parsedUrl = url;
-    evt.query = parseQuery(url.search.substring(1));
+    evt.query = parseQuery(url.search);
     evt.response = {
       status: 200,
       headers: new Headers(),

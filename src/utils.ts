@@ -47,9 +47,9 @@ export function myParse(arr: any[]) {
 }
 
 export function parseQuery(query: FormData | string) {
-  if (query === null) return {};
+  if (!query) return {};
   if (typeof query === "string") {
-    const data = new URLSearchParams("?" + query);
+    const data = new URLSearchParams(query);
     return myParse(Array.from(data.entries()));
   }
   return myParse(Array.from(query.entries()));
