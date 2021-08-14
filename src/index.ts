@@ -6,11 +6,13 @@ import {
   NextResponse,
   TObject,
   Options,
+  TBody,
 } from "./types";
 import { createRegex, findRoute, parseQuery } from "./utils";
 import { parseBody } from "./body";
 
 type Router = Record<string, Handler | Handler[] | string>;
+
 type Area = {
   prefix?: string;
   wares?: Handler | Handler[];
@@ -109,7 +111,7 @@ function router(
       status: 200,
       headers: new Headers(),
       send(body) {
-        return send(body as BodyInit, {
+        return send(body, {
           status: this.status,
           headers: this.headers,
         });
@@ -133,7 +135,7 @@ function router(
   };
 }
 
-const res = (a: BodyInit, b: ResponseInit) => new Response(a, b);
+const res = (a: TBody, b: ResponseInit) => new Response(a, b);
 const isJson = (body: BodyInit) =>
   !(
     body instanceof Uint8Array ||
@@ -141,12 +143,12 @@ const isJson = (body: BodyInit) =>
     body instanceof FormData ||
     body instanceof Blob
   );
-function send(body: BodyInit, opts: ResponseInit) {
+function send(body: TObject | TBody, opts: ResponseInit) {
   if (typeof body === "object") {
     if (body instanceof Response) {
       return body;
     }
-    if (isJson(body)) {
+    if (isJson(body as BodyInit)) {
       body = JSON.stringify(body);
       (opts.headers as Headers).set(
         "Content-Type",
@@ -154,7 +156,7 @@ function send(body: BodyInit, opts: ResponseInit) {
       );
     }
   }
-  return res(body, opts);
+  return res(body as TBody, opts);
 }
 async function handlePromise(
   body: Promise<BodyInit | TObject>,

@@ -1,8 +1,9 @@
 export type TObject = { [k: string]: any };
+export type TBody = BodyInit | null | undefined;
 export type HttpResponse = {
   status: number;
   headers: Headers;
-  send: (body: Promise<BodyInit | TObject> | BodyInit | TObject) => RetHandler;
+  send: (body: TObject | TBody) => RetHandler;
   [k: string]: any;
 };
 export type FetchEvent = {
