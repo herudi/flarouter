@@ -1,0 +1,33 @@
+{
+  "name": "flarouter",
+  "version": "1.0.0",
+  "description": "Router middleware for cloudflare-workers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Herudi",
+  "license": "MIT",
+  "scripts": {
+    "format": "prettier --write src",
+    "clean": "rimraf dist",
+    "build": "rimraf dist && ncc build src/index.ts -o dist -m"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@vercel/ncc": "^0.29.1",
+    "prettier": "^2.3.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.3.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/herudi/flarouter"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "cloudflare workers",
+    "cloudflare workers router",
+    "Simple cloudflare workers framework"
+  ]
+}
