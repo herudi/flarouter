@@ -73,7 +73,7 @@ function router(
       wares = toArray(opts.wares);
     }
   } else {
-    args = args.concat([opts as Router]);
+    args = [opts as Router].concat(args);
   }
   const len = args.length;
   while (j < len) {
@@ -131,6 +131,9 @@ function router(
       }
       return evt.response.send(ret);
     };
+    if (method === "GET" || method === "HEAD") {
+      return next();
+    }
     return parseBody(parseQuery, evt, next);
   };
 }
