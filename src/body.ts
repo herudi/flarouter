@@ -23,8 +23,8 @@ export async function parseBody(
       try {
         const body = await request.text();
         evt.body = parse(body);
-      } catch (error) {
-        return next(error);
+      } catch (err) {
+        return next(err);
       }
     } else if (isType(headers, "text/plain")) {
       try {
@@ -34,12 +34,16 @@ export async function parseBody(
         } catch (_e) {
           evt.body = { _raw: body };
         }
-      } catch (error) {
-        return next(error);
+      } catch (err) {
+        return next(err);
       }
     } else if (isType(headers, "multipart/form-data")) {
-      const formData = await request.formData();
-      evt.body = parse(formData);
+      try {
+        const formData = await request.formData();
+        evt.body = parse(formData);
+      } catch (err) {
+        return next(err);
+      }
     }
   }
   return next();

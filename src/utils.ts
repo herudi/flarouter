@@ -56,30 +56,26 @@ export function parseQuery(query: FormData | string) {
 }
 
 export function findRoute(method: string, pathname: string, route: TObject) {
+  pathname = unescape(pathname);
   let fns = [],
     params: TObject = {},
     i = 0,
     obj: TObject,
-    matches: any[],
-    j = 0;
+    match: any;
   let arr = route[method] || [];
   if (route["ANY"]) arr = arr.concat(route["ANY"]);
   const len = arr.length;
   while (i < len) {
     obj = arr[i];
     if (obj.rgx.test(pathname)) {
+      match = obj.rgx.exec(pathname);
       fns = obj.fns;
-      if (obj.arr) {
-        matches = obj.rgx.exec(pathname);
-        matches.shift();
-        while (j < obj.arr.length) {
-          const str = matches[j];
-          params[obj.arr[j]] = str ? unescape(str) : null;
-          j++;
-        }
-        if (params["wild"]) {
-          params["wild"] = params["wild"].split("/");
-        }
+      if (match.groups) {
+        params = match.groups;
+      }
+      if (obj.wild && typeof match[1] === "string") {
+        params["wild"] = match[1].split("/");
+        params["wild"].shift();
       }
       break;
     }
@@ -88,14 +84,19 @@ export function findRoute(method: string, pathname: string, route: TObject) {
   return { params, fns };
 }
 export function createRegex(str: string) {
-  let noop = "",
-    ptt = "/([^/]+?)",
-    last = str[str.length - 1];
-  if (last === "*") noop = "(.*)";
-  else if (last === "?") ptt = "(?:/([^/]+?))?";
-  const m = str.match(/\:([a-z_-]+)/g);
-  let arr = m ? m.map((e) => e.substring(1)) : [];
-  if (noop) arr.push("wild");
-  const rgx = new RegExp(`^${str.replace(/\/:[a-z_-]+/g, ptt)}/${noop}?$`, "i");
-  return { arr, rgx };
+  let wild = false;
+  let strict = /\*|\./;
+  str = str
+    .replace(/\/$/, "")
+    .replace(/:(\w+)(\?)?(\.)?/g, "$2(?<$1>[^/]+)$2$3");
+  if (strict.test(str)) {
+    str = str
+      .replace(/(\/?)\*/g, (_, p) => {
+        wild = true;
+        return `(${p}.*)?`;
+      })
+      .replace(/\.(?=[\w(])/, "\\.");
+  }
+  const rgx = new RegExp(`^${str}/*$`);
+  return { rgx, wild };
 }

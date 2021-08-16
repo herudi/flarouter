@@ -87,11 +87,11 @@ function router(
         const idx = k.indexOf("/");
         let path = k.substring(idx);
         if (prefix !== "" && path === "/") path = "";
-        const { arr, rgx } = createRegex(prefix + path);
+        const { wild, rgx } = createRegex(prefix + path);
         const method = k.substring(0, idx);
         const fns = _wares.concat(toArray(fn));
         route[method] = route[method] || [];
-        route[method].push({ arr, rgx, fns });
+        route[method].push({ wild, rgx, fns });
       }
     }
     j++;
